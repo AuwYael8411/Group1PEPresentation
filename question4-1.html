@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="UTF-8">
+  <title>noob</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+
+  <style>
+  body	{
+  	text-align: center;
+  }
+    .btn {
+    display: inline-block;
+    border-radius: 20px;
+    border: 5px solid #ff3d3d;
+     padding: 10px 20px;
+    background-color: #bd1414;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    display: block;
+    width: fit-content;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Pixelify Sans', sans-serif;
+    text-decoration: none;
+    }
+
+    .btn:hover {
+    background-color: #681414;
+    color: #feb3b3;
+    }
+
+  a {
+    text-decoration: none;
+    text-align: center;
+    color: #fff;
+    font-size: 50px;
+    margin-top: 100px;
+     -webkit-text-stroke: 3px black;
+    font-family: 'Pixelify Sans', sans-serif;
+    }
+
+    a {
+    animation: float 2.5s ease-in-out infinite;
+}
+
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+  #message {
+  	display: none;
+  }
+
+  </style>
+
+  </head>
+<body>
+
+<video src="q4video.mp4" width="500" height="500" autoplay controls></video>
+
+<a class="btn" id="message" href="question5.html">sorry po...next question na...</a>
+
+<script>
+    setTimeout(function() {
+    document.getElementById("message").style.display = "block";
+}, 5000);
+</script>
+
+</body>
+</html>
