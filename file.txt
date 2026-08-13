@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+    margin: 0;
+    background-color: #920000;
+
+    background-image:
+        linear-gradient(#b63434 4px, transparent 4px),
+        linear-gradient(90deg, #b63434 4px, transparent 4px);
+
+    background-size: 40px 40px;
+
+    animation: gridMove 2s linear infinite;
+
+    font-family: 'Pixelify Sans', sans-serif;
+    color: white;
+    text-align: center;
+}
+
+@keyframes gridMove {
+
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 40px 40px;
+    }
+
+}
+
+h1 {
+    font-size: 70px;
+    margin-top: 40px;
+
+    -webkit-text-stroke: 3px black;
+}
+
+#instructions {
+    font-size: 30px;
+    -webkit-text-stroke: 2px black;
+}
+
+#gameContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+canvas {
+    background: #920000;
+
+    border: 8px solid #ff3d3d;
+    border-radius: 15px;
+
+    box-shadow: 0 8px 0 #5c0000;
+
+    cursor: crosshair;
+}
+
+#message {
+    font-size: 40px;
+    margin-top: 25px;
+
+    -webkit-text-stroke: 2px black;
+}
+
+#answer {
+    display: none;
+
+    margin: 30px auto;
+
+    width: fit-content;
+
+    padding: 20px 40px;
+
+    background: #bd1414;
+
+    border: 6px solid #ff3d3d;
+    border-radius: 20px;
+
+    font-size: 55px;
+    font-weight: bold;
+
+    -webkit-text-stroke: 3px black;
+}
+
+.btn {
+    display: inline-block;
+
+    margin: 15px;
+    padding: 15px 30px;
+
+    background: #bd1414;
+
+    border: 5px solid #ff3d3d;
+    border-radius: 20px;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 30px;
+    font-weight: bold;
+
+    -webkit-text-stroke: 2px black;
+
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background: #681414;
+
+    color: #feb3b3;
+
+    transform: translateY(-5px);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>THE MAZE</h1>
+
+<p id="instructions">
+    Move your mouse through the maze.<br>
+    Don't touch the walls.
+</p>
+
+<div id="gameContainer">
+    <canvas id="maze"></canvas>
+</div>
+
+<div id="message">
+    GOOD LUCK :)
+</div>
+
+<div id="answer">
+    🎮 SPACEWAR!
+</div>
+
+<a href="question4.html" class="btn" id="continueBtn" style="display:none;">
+    CONTINUE
+</a>
+
+
+<script>
+
+const canvas = document.getElementById("maze");
+const ctx = canvas.getContext("2d");
+
+const message = document.getElementById("message");
+const answer = document.getElementById("answer");
+const continueBtn = document.getElementById("continueBtn");
+
+
+// ===============================
+// MAZE SETTINGS
+// ===============================
+
+const cellSize = 50;
+
+const maze = [
+
+    "#################",
+    "#S              #",
+    "# ############# #",
+    "# #             #",
+    "# # #############",
+    "# #             #",
+    "# ############# #",
+    "#               #",
+    "############### #",
+    "#               #",
+    "# ###############",
+    "#               #",
+    "############### #",
+    "#               #",
+    "# ############# #",
+    "#             G #",
+    "#################"
+
+];
+
+const rows = maze.length;
+const cols = maze[0].length;
+
+canvas.width = cols * cellSize;
+canvas.height = rows * cellSize;
+
+
+// ===============================
+// PLAYER
+// ===============================
+
+let player = {
+    x: 1.5 * cellSize,
+    y: 1.5 * cellSize,
+    radius: 8
+};
+
+let gameFinished = false;
+
+
+// ===============================
+// DRAW MAZE
+// ===============================
+
+function drawMaze() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    // Draw walls
+
+    for (let row = 0; row < rows; row++) {
+
+        for (let col = 0; col < cols; col++) {
+
+            if (maze[row][col] === "#") {
+
+                ctx.fillStyle = "#000";
+
+                ctx.fillRect(
+                    col * cellSize,
+                    row * cellSize,
+                    cellSize,
+                    cellSize
+                );
+
+            }
+
+        }
+
+    }
+
+
+    // Draw START
+
+    ctx.fillStyle = "#ff3d3d";
+
+    ctx.fillRect(
+        cellSize,
+        cellSize,
+        cellSize,
+        cellSize
+    );
+
+
+    ctx.fillStyle = "white";
+
+    ctx.font = "20px Pixelify Sans";
+
+    ctx.fillText(
+        "START",
+        cellSize + 5,
+        cellSize + 30
+    );
+
+
+    // Draw GOAL
+
+    for (let row = 0; row < rows; row++) {
+
+        for (let col = 0; col < cols; col++) {
+
+            if (maze[row][col] === "G") {
+
+                ctx.fillStyle = "#ff3d3d";
+
+                ctx.fillRect(
+                    col * cellSize,
+                    row * cellSize,
+                    cellSize,
+                    cellSize
+                );
+
+                ctx.fillStyle = "white";
+
+                ctx.font = "22px Pixelify Sans";
+
+                ctx.fillText(
+                    "GO!",
+                    col * cellSize + 7,
+                    row * cellSize + 32
+                );
+
+            }
+
+        }
+
+    }
+
+
+    // Draw player
+
+    ctx.beginPath();
+
+    ctx.arc(
+        player.x,
+        player.y,
+        player.radius,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "#fff";
+
+    ctx.fill();
+
+    ctx.strokeStyle = "#000";
+
+    ctx.lineWidth = 3;
+
+    ctx.stroke();
+
+}
+
+
+// ===============================
+// CHECK WALL COLLISION
+// ===============================
+
+function touchingWall(x, y) {
+
+    const left =
+        Math.floor((x - player.radius) / cellSize);
+
+    const right =
+        Math.floor((x + player.radius) / cellSize);
+
+    const top =
+        Math.floor((y - player.radius) / cellSize);
+
+    const bottom =
+        Math.floor((y + player.radius) / cellSize);
+
+
+    for (let row = top; row <= bottom; row++) {
+
+        for (let col = left; col <= right; col++) {
+
+            if (
+                row < 0 ||
+                row >= rows ||
+                col < 0 ||
+                col >= cols
+            ) {
+
+                return true;
+
+            }
+
+
+            if (maze[row][col] === "#") {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+// ===============================
+// CHECK GOAL
+// ===============================
+
+function reachedGoal(x, y) {
+
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+
+    return maze[row][col] === "G";
+
+}
+
+
+// ===============================
+// RESET PLAYER
+// ===============================
+
+function resetPlayer() {
+
+    player.x = 1.5 * cellSize;
+    player.y = 1.5 * cellSize;
+
+    message.textContent = "OUCH! DON'T TOUCH THE WALLS.";
+
+    setTimeout(() => {
+
+        if (!gameFinished) {
+            message.textContent = "TRY AGAIN :)";
+        }
+
+    }, 1000);
+
+    drawMaze();
+
+}
+
+
+// ===============================
+// MOUSE MOVEMENT
+// ===============================
+
+canvas.addEventListener("mousemove", function(event) {
+
+    if (gameFinished) {
+        return;
+    }
+
+
+    const rect = canvas.getBoundingClientRect();
+
+
+    const mouseX =
+        event.clientX - rect.left;
+
+    const mouseY =
+        event.clientY - rect.top;
+
+
+    // Check collision before moving
+
+    if (touchingWall(mouseX, mouseY)) {
+
+        resetPlayer();
+
+        return;
+
+    }
+
+
+    player.x = mouseX;
+    player.y = mouseY;
+
+
+    // Check goal
+
+    if (reachedGoal(player.x, player.y)) {
+
+        finishGame();
+
+        return;
+
+    }
+
+
+    drawMaze();
+
+});
+
+
+// ===============================
+// FINISH GAME
+// ===============================
+
+function finishGame() {
+
+    gameFinished = true;
+
+    message.textContent =
+        "YOU MADE IT!";
+
+    answer.style.display = "block";
+
+    continueBtn.style.display =
+        "inline-block";
+
+    drawMaze();
+
+}
+
+
+// ===============================
+// START GAME
+// ===============================
+
+drawMaze();
+
+</script>
+
+</body>
+</html>
